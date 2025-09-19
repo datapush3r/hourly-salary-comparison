@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Salary & Super Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+            border-color: #6366F1;
+        }
+        .result-card {
+            background-color: white;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4f46e5;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <div class="max-w-5xl mx-auto">
+            <!-- Header -->
+            <header class="text-center mb-10">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Salary Comparison Calculator</h1>
+                <p class="mt-2 text-lg text-gray-600">Compare a contract rate vs. a full-time salary package side-by-side.</p>
+            </header>
+
+            <main>
+                <!-- Shared Inputs & Adjustments -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                        <div>
+                           <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Work Schedule</h2>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label for="hoursPerWeek" class="block text-sm font-medium text-gray-700 mb-1">Hours per Week</label>
+                                    <input type="number" id="hoursPerWeek" value="38" class="form-input w-full px-4 py-3 bg-gray-100 border-2 border-transparent rounded-lg text-lg transition duration-200">
+                                </div>
+                                <div>
+                                    <label for="daysPerWeek" class="block text-sm font-medium text-gray-700 mb-1">Days per Week</label>
+                                    <input type="number" id="daysPerWeek" value="5" class="form-input w-full px-4 py-3 bg-gray-100 border-2 border-transparent rounded-lg text-lg transition duration-200">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                             <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Comparison Adjustments</h2>
+                             <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <label for="stateSelect" class="text-sm font-medium text-gray-700">State/Territory (for holidays)</label>
+                                    <select id="stateSelect" class="form-input rounded-lg bg-gray-100 border-transparent text-sm py-1">
+                                        <option value="NSW">NSW</option>
+                                        <option value="VIC">VIC</option>
+                                        <option value="QLD">QLD</option>
+                                        <option value="WA">WA</option>
+                                        <option value="SA">SA</option>
+                                        <option value="TAS">TAS</option>
+                                        <option value="ACT">ACT</option>
+                                        <option value="NT">NT</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Account for unpaid leave? <span class="text-xs">(Contractor)</span></span>
+                                    <label class="switch"><input type="checkbox" id="unpaidLeaveToggle"><span class="slider"></span></label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Have HECS/HELP debt?</span>
+                                    <label class="switch"><input type="checkbox" id="hecsToggle"><span class="slider"></span></label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">High income, no private health? <span class="text-xs">(MLS)</span></span>
+                                    <label class="switch"><input type="checkbox" id="mlsToggle"><span class="slider"></span></label>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Columns -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Contract Column -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Contract Role</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                             <div>
+                                <label for="hourlyRate" class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
+                                <input type="number" id="hourlyRate" placeholder="e.g., 80" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                            </div>
+                            <div>
+                                <label for="dailyRate" class="block text-sm font-medium text-gray-700 mb-1">Daily Rate ($)</label>
+                                <input type="number" id="dailyRate" placeholder="e.g., 640" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="result-card">
+                                <p id="grossBillingsLabel" class="font-medium text-gray-600">Gross Yearly Billings</p>
+                                <p id="contractYearlySalary" class="text-xl font-semibold text-gray-900">$0.00</p>
+                            </div>
+                            <div class="result-card">
+                                <p class="font-medium text-red-600">Superannuation <span class="text-xs">(to pay)</span></p>
+                                <p id="contractSuper" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            </div>
+                            <div class="result-card">
+                                <p class="font-medium text-red-600">Yearly Tax <span id="contractTaxLabel" class="text-xs">(est.)</span></p>
+                                <p id="contractIncomeTax" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            </div>
+                            <hr class="!my-4 border-gray-200">
+                            <div class="result-card bg-green-600 text-white">
+                                <p class="font-bold">Take-Home Pay (Yearly)</p>
+                                <p id="contractPostTaxYearly" class="text-xl font-bold">$0.00</p>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Hourly</p> <p id="contractPostTaxHourly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Daily</p> <p id="contractPostTaxDaily" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Weekly</p> <p id="contractPostTaxWeekly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Fortnightly</p> <p id="contractPostTaxFortnightly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Monthly</p> <p id="contractPostTaxMonthly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Quarterly</p> <p id="contractPostTaxQuarterly" class="font-semibold text-gray-800">$0.00</p> </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full-time Column -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Full-time Role</h2>
+                        <div class="mb-6">
+                            <label for="annualSalaryInput" class="block text-sm font-medium text-gray-700 mb-1">Annual Salary (pre-tax)</label>
+                            <input type="number" id="annualSalaryInput" placeholder="e.g., 130000" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                        </div>
+                         <div class="space-y-3">
+                            <div class="result-card">
+                                <p class="font-medium text-gray-600">Yearly Salary <span class="text-xs">(pre-tax)</span></p>
+                                <p id="fullTimeYearlySalary" class="text-xl font-semibold text-gray-900">$0.00</p>
+                            </div>
+                            <div class="result-card">
+                                <p class="font-medium text-gray-600">Superannuation</p>
+                                <p id="fullTimeSuper" class="text-lg font-semibold text-gray-800">$0.00</p>
+                            </div>
+                            <div class="result-card">
+                                <p class="font-medium text-red-600">Yearly Tax <span id="fullTimeTaxLabel" class="text-xs">(est.)</span></p>
+                                <p id="fullTimeIncomeTax" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            </div>
+                             <hr class="!my-4 border-gray-200">
+                            <div class="result-card bg-green-600 text-white">
+                                <p class="font-bold">Take-Home Pay (Yearly)</p>
+                                <p id="fullTimePostTaxYearly" class="text-xl font-bold">$0.00</p>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Hourly</p> <p id="fullTimePostTaxHourly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Daily</p> <p id="fullTimePostTaxDaily" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Weekly</p> <p id="fullTimePostTaxWeekly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Fortnightly</p> <p id="fullTimePostTaxFortnightly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Monthly</p> <p id="fullTimePostTaxMonthly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Quarterly</p> <p id="fullTimePostTaxQuarterly" class="font-semibold text-gray-800">$0.00</p> </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- Difference Comparison Section -->
+                <div class="mt-8 bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Take-Home Pay Difference</h3>
+                    <p id="differenceText" class="text-2xl font-bold text-gray-700">Enter values to compare</p>
+                </div>
+
+                <div class="text-center mt-8">
+                    <p id="superNote" class="text-sm text-gray-500 max-w-3xl mx-auto"></p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const hoursPerWeekInput = document.getElementById('hoursPerWeek');
+        const daysPerWeekInput = document.getElementById('daysPerWeek');
+        const superNoteEl = document.getElementById('superNote');
+        const unpaidLeaveToggle = document.getElementById('unpaidLeaveToggle');
+        const hecsToggle = document.getElementById('hecsToggle');
+        const mlsToggle = document.getElementById('mlsToggle');
+        const stateSelect = document.getElementById('stateSelect');
+        const grossBillingsLabel = document.getElementById('grossBillingsLabel');
+        const contractTaxLabel = document.getElementById('contractTaxLabel');
+        const fullTimeTaxLabel = document.getElementById('fullTimeTaxLabel');
+
+        // Contract Elements
+        const hourlyRateInput = document.getElementById('hourlyRate');
+        const dailyRateInput = document.getElementById('dailyRate');
+        const contractYearlySalaryEl = document.getElementById('contractYearlySalary');
+        const contractIncomeTaxEl = document.getElementById('contractIncomeTax');
+        const contractPostTaxYearlyEl = document.getElementById('contractPostTaxYearly');
+        const contractSuperEl = document.getElementById('contractSuper');
+        const contractPostTaxHourlyEl = document.getElementById('contractPostTaxHourly');
+        const contractPostTaxDailyEl = document.getElementById('contractPostTaxDaily');
+        const contractPostTaxWeeklyEl = document.getElementById('contractPostTaxWeekly');
+        const contractPostTaxFortnightlyEl = document.getElementById('contractPostTaxFortnightly');
+        const contractPostTaxMonthlyEl = document.getElementById('contractPostTaxMonthly');
+        const contractPostTaxQuarterlyEl = document.getElementById('contractPostTaxQuarterly');
+
+        // Full-time Elements
+        const annualSalaryInput = document.getElementById('annualSalaryInput');
+        const fullTimeYearlySalaryEl = document.getElementById('fullTimeYearlySalary');
+        const fullTimeIncomeTaxEl = document.getElementById('fullTimeIncomeTax');
+        const fullTimePostTaxYearlyEl = document.getElementById('fullTimePostTaxYearly');
+        const fullTimeSuperEl = document.getElementById('fullTimeSuper');
+        const fullTimePostTaxHourlyEl = document.getElementById('fullTimePostTaxHourly');
+        const fullTimePostTaxDailyEl = document.getElementById('fullTimePostTaxDaily');
+        const fullTimePostTaxWeeklyEl = document.getElementById('fullTimePostTaxWeekly');
+        const fullTimePostTaxFortnightlyEl = document.getElementById('fullTimePostTaxFortnightly');
+        const fullTimePostTaxMonthlyEl = document.getElementById('fullTimePostTaxMonthly');
+        const fullTimePostTaxQuarterlyEl = document.getElementById('fullTimePostTaxQuarterly');
+        
+        // Comparison Element
+        const differenceTextEl = document.getElementById('differenceText');
+
+        // --- State ---
+        let lastChangedRate = 'hourly';
+        let contractTakeHomeYearly = 0;
+        let fullTimeTakeHomeYearly = 0;
+
+        // --- Constants & Public Data ---
+        const SUPER_RATE = 0.12; 
+        const WEEKS_PER_YEAR_DEFAULT = 52;
+        const WEEKS_PER_YEAR_WITH_LEAVE = 46; // 52 - 4 weeks annual - 2 weeks sick
+
+        const PUBLIC_HOLIDAYS = {
+            NSW: 11, VIC: 13, QLD: 11, WA: 11, SA: 11, TAS: 11, ACT: 13, NT: 11
+        };
+
+        const HECS_HELP_RATES = [
+            { threshold: 143837, rate: 0.10 }, { threshold: 135695, rate: 0.095 },
+            { threshold: 128014, rate: 0.09 }, { threshold: 120768, rate: 0.085 },
+            { threshold: 113932, rate: 0.08 }, { threshold: 107482, rate: 0.075 },
+            { threshold: 101398, rate: 0.07 }, { threshold: 95663, rate: 0.065 },
+            { threshold: 89923, rate: 0.06 }, { threshold: 84522, rate: 0.055 },
+            { threshold: 79442, rate: 0.05 }, { threshold: 74665, rate: 0.045 },
+            { threshold: 70176, rate: 0.04 }, { threshold: 65959, rate: 0.035 },
+            { threshold: 62002, rate: 0.03 }, { threshold: 58288, rate: 0.025 },
+            { threshold: 54805, rate: 0.02 }, { threshold: 51550, rate: 0.01 },
+        ];
+        
+        // --- Utility Functions ---
+        const formatCurrency = (value, showNegative = false) => {
+            const num = isNaN(value) || !isFinite(value) ? 0 : value;
+            const sign = showNegative ? '-' : '';
+            return sign + num.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+        
+        // --- Tax Calculation (2024-2025 rates) ---
+        function calculateTax(income, options = {}) {
+            const { hasHECS = false, hasMLS = false } = options;
+            const MEDICARE_LEVY_RATE = 0.02;
+            let totalTax = 0;
+            let taxLabelAddons = [];
+
+            // Income Tax
+            let incomeTax = 0;
+            if (income > 190000) incomeTax = 52442 + (income - 190000) * 0.45;
+            else if (income > 135000) incomeTax = 32092 + (income - 135000) * 0.37;
+            else if (income > 45000) incomeTax = 5092 + (income - 45000) * 0.30;
+            else if (income > 18200) incomeTax = (income - 18200) * 0.19;
+            totalTax += incomeTax;
+
+            // Medicare Levy
+            totalTax += income * MEDICARE_LEVY_RATE;
+
+            // HECS/HELP Repayment
+            if (hasHECS) {
+                const hecsTier = HECS_HELP_RATES.find(tier => income >= tier.threshold);
+                if (hecsTier) {
+                    totalTax += income * hecsTier.rate;
+                    taxLabelAddons.push('HECS');
+                }
+            }
+
+            // Medicare Levy Surcharge
+            if (hasMLS) {
+                let mlsRate = 0;
+                if (income > 151000) mlsRate = 0.015;
+                else if (income > 113000) mlsRate = 0.0125;
+                else if (income > 97000) mlsRate = 0.01;
+                if (mlsRate > 0) {
+                    totalTax += income * mlsRate;
+                    taxLabelAddons.push('MLS');
+                }
+            }
+            
+            const taxLabel = `(est. ${taxLabelAddons.length > 0 ? `inc. ${taxLabelAddons.join('/')}` : ''})`;
+            return { totalTax, taxLabel };
+        }
+
+        // --- Comparison Function ---
+        function updateDifference() {
+            if (contractTakeHomeYearly <= 0 && fullTimeTakeHomeYearly <= 0) {
+                differenceTextEl.textContent = 'Enter values to compare';
+                differenceTextEl.className = 'text-2xl font-bold text-gray-700';
+                return;
+            }
+            const difference = contractTakeHomeYearly - fullTimeTakeHomeYearly;
+            if (difference > 0.01) {
+                differenceTextEl.textContent = `${formatCurrency(Math.abs(difference))} / year more as a Contractor`;
+                differenceTextEl.className = 'text-2xl font-bold text-green-700';
+            } else if (difference < -0.01) {
+                differenceTextEl.textContent = `${formatCurrency(Math.abs(difference))} / year more as a Full-time Employee`;
+                differenceTextEl.className = 'text-2xl font-bold text-indigo-700';
+            } else {
+                differenceTextEl.textContent = 'The take-home pay is effectively identical.';
+                differenceTextEl.className = 'text-2xl font-bold text-gray-800';
+            }
+        }
+
+        // --- Main Calculation Functions ---
+        function calculateContract() {
+            const hoursPerWeek = parseFloat(hoursPerWeekInput.value) || 0;
+            const daysPerWeek = parseFloat(daysPerWeekInput.value) || 0;
+            const hourlyRate = parseFloat(hourlyRateInput.value) || 0;
+            const dailyRateVal = parseFloat(dailyRateInput.value) || 0;
+
+            const weeksToWork = unpaidLeaveToggle.checked ? WEEKS_PER_YEAR_WITH_LEAVE : WEEKS_PER_YEAR_DEFAULT;
+            const holidays = PUBLIC_HOLIDAYS[stateSelect.value] || 0;
+            
+            grossBillingsLabel.textContent = unpaidLeaveToggle.checked ? 'Gross Yearly Billings (Adjusted)' : 'Gross Yearly Billings';
+
+            let totalPackage = 0;
+            if (daysPerWeek > 0) {
+                // Prioritize daily rate for accuracy with leave/holidays
+                const effectiveDailyRate = lastChangedRate === 'daily' ? dailyRateVal : hourlyRate * (hoursPerWeek / daysPerWeek);
+                const billableDays = (daysPerWeek * weeksToWork) - holidays;
+                totalPackage = effectiveDailyRate * billableDays;
+            }
+
+            const taxableIncome = totalPackage / (1 + SUPER_RATE);
+            const superannuation = totalPackage - taxableIncome;
+
+            const taxOptions = { hasHECS: hecsToggle.checked, hasMLS: mlsToggle.checked };
+            const { totalTax, taxLabel } = calculateTax(taxableIncome, taxOptions);
+            const postTaxYearly = taxableIncome - totalTax;
+
+            contractTakeHomeYearly = postTaxYearly;
+
+            const workingWeeksForBreakdown = unpaidLeaveToggle.checked ? WEEKS_PER_YEAR_WITH_LEAVE : WEEKS_PER_YEAR_DEFAULT;
+            const postTaxWeekly = workingWeeksForBreakdown > 0 ? postTaxYearly / workingWeeksForBreakdown : 0;
+            const postTaxDaily = daysPerWeek > 0 ? postTaxWeekly / daysPerWeek : 0;
+            const postTaxHourly = hoursPerWeek > 0 ? postTaxWeekly / hoursPerWeek : 0;
+            
+            // Update main display
+            contractYearlySalaryEl.textContent = formatCurrency(totalPackage);
+            contractTaxLabel.textContent = taxLabel;
+            contractIncomeTaxEl.textContent = formatCurrency(totalTax, true);
+            contractPostTaxYearlyEl.textContent = formatCurrency(postTaxYearly);
+            contractSuperEl.textContent = formatCurrency(superannuation, true);
+            
+            // Update breakdown display (based on actual working time)
+            contractPostTaxHourlyEl.textContent = formatCurrency(postTaxHourly);
+            contractPostTaxDailyEl.textContent = formatCurrency(postTaxDaily);
+            contractPostTaxWeeklyEl.textContent = formatCurrency(postTaxWeekly);
+            contractPostTaxFortnightlyEl.textContent = formatCurrency(postTaxWeekly * 2);
+            contractPostTaxMonthlyEl.textContent = formatCurrency(postTaxYearly / 12);
+            contractPostTaxQuarterlyEl.textContent = formatCurrency(postTaxYearly / 4);
+
+            updateDifference();
+        }
+
+        function calculateFullTime() {
+            const hoursPerWeek = parseFloat(hoursPerWeekInput.value) || 0;
+            const daysPerWeek = parseFloat(daysPerWeekInput.value) || 0;
+            const yearlySalary = parseFloat(annualSalaryInput.value) || 0;
+            
+            const superannuation = yearlySalary * SUPER_RATE;
+            const taxOptions = { hasHECS: hecsToggle.checked, hasMLS: mlsToggle.checked };
+            const { totalTax, taxLabel } = calculateTax(yearlySalary, taxOptions);
+            const postTaxYearly = yearlySalary - totalTax;
+            
+            fullTimeTakeHomeYearly = postTaxYearly;
+
+            const postTaxWeekly = postTaxYearly / WEEKS_PER_YEAR_DEFAULT;
+            const postTaxDaily = daysPerWeek > 0 ? postTaxWeekly / daysPerWeek : 0;
+            const postTaxHourly = hoursPerWeek > 0 ? postTaxWeekly / hoursPerWeek : 0;
+            
+            // Update main display
+            fullTimeYearlySalaryEl.textContent = formatCurrency(yearlySalary);
+            fullTimeTaxLabel.textContent = taxLabel;
+            fullTimeIncomeTaxEl.textContent = formatCurrency(totalTax, true);
+            fullTimePostTaxYearlyEl.textContent = formatCurrency(postTaxYearly);
+            fullTimeSuperEl.textContent = formatCurrency(superannuation);
+            
+            // Update breakdown display
+            fullTimePostTaxHourlyEl.textContent = formatCurrency(postTaxHourly);
+            fullTimePostTaxDailyEl.textContent = formatCurrency(postTaxDaily);
+            fullTimePostTaxWeeklyEl.textContent = formatCurrency(postTaxWeekly);
+            fullTimePostTaxFortnightlyEl.textContent = formatCurrency(postTaxWeekly * 2);
+            fullTimePostTaxMonthlyEl.textContent = formatCurrency(postTaxYearly / 12);
+            fullTimePostTaxQuarterlyEl.textContent = formatCurrency(postTaxYearly / 4);
+            updateDifference();
+        }
+
+        // --- Event Listeners ---
+        function recalculateAll() {
+            calculateContract();
+            calculateFullTime();
+        }
+
+        hourlyRateInput.addEventListener('input', () => {
+            lastChangedRate = 'hourly';
+            const daily = (parseFloat(hourlyRateInput.value) * (parseFloat(hoursPerWeekInput.value) || 0)) / (parseFloat(daysPerWeekInput.value) || 1);
+            dailyRateInput.value = isFinite(daily) && daily > 0 ? daily.toFixed(2) : '';
+            recalculateAll();
+        });
+
+        dailyRateInput.addEventListener('input', () => {
+            lastChangedRate = 'daily';
+            const hourly = (parseFloat(dailyRateInput.value) * (parseFloat(daysPerWeekInput.value) || 0)) / (parseFloat(hoursPerWeekInput.value) || 1);
+            hourlyRateInput.value = isFinite(hourly) && hourly > 0 ? hourly.toFixed(2) : '';
+            recalculateAll();
+        });
+
+        annualSalaryInput.addEventListener('input', recalculateAll);
+        hoursPerWeekInput.addEventListener('input', recalculateAll);
+        daysPerWeekInput.addEventListener('input', recalculateAll);
+        unpaidLeaveToggle.addEventListener('change', recalculateAll);
+        hecsToggle.addEventListener('change', recalculateAll);
+        mlsToggle.addEventListener('change', recalculateAll);
+        stateSelect.addEventListener('change', recalculateAll);
+
+        // --- Initial Load ---
+        function initialize() {
+            superNoteEl.textContent = `The final 'Take-Home Pay' is the key figure for comparing your net income. Calculations use the Australian Superannuation Guarantee rate of ${(SUPER_RATE * 100).toFixed(1)}% and 2024-25 tax rates. Adjustments can be made for unpaid leave, public holidays, HECS/HELP debt, and the Medicare Levy Surcharge.`;
+            recalculateAll();
+        }
+
+        window.onload = initialize;
+    </script>
+
+</body>
+</html>
+
