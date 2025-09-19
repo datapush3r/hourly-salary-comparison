@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Australian Salary & Super Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,43 +17,7 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .form-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
-            border-color: #6366F1;
-        }
-        .result-card {
-            background-color: white;
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
+        /* Custom CSS for the toggle switch's ::before pseudo-element */
         .slider:before {
             position: absolute;
             content: "";
@@ -60,47 +29,51 @@
             transition: .4s;
             border-radius: 50%;
         }
-        input:checked + .slider {
-            background-color: #4f46e5;
-        }
         input:checked + .slider:before {
             transform: translateX(20px);
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-black text-gray-800 dark:text-gray-300 transition-colors duration-300">
 
     <div class="container mx-auto px-4 py-8 md:py-12">
-        <div class="max-w-5xl mx-auto">
+        <div class="max-w-5xl mx-auto relative">
+             <!-- Theme Switcher -->
+            <div class="absolute top-0 right-0">
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707-.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
             <!-- Header -->
             <header class="text-center mb-10">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Salary Comparison Calculator</h1>
-                <p class="mt-2 text-lg text-gray-600">Compare a contract rate vs. a full-time salary package side-by-side.</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Salary Comparison Calculator</h1>
+                <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Compare a contract rate vs. a full-time salary package side-by-side.</p>
             </header>
 
             <main>
                 <!-- Shared Inputs & Adjustments -->
-                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mb-8">
+                <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-6 md:p-8 rounded-2xl shadow-lg mb-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                         <div>
-                           <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Work Schedule</h2>
+                           <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Work Schedule</h2>
                             <div class="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label for="hoursPerWeek" class="block text-sm font-medium text-gray-700 mb-1">Hours per Week</label>
-                                    <input type="number" id="hoursPerWeek" value="38" class="form-input w-full px-4 py-3 bg-gray-100 border-2 border-transparent rounded-lg text-lg transition duration-200">
+                                    <label for="hoursPerWeek" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Hours per Week</label>
+                                    <input type="number" id="hoursPerWeek" value="38" class="w-full px-4 py-3 bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 rounded-lg text-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                                 </div>
                                 <div>
-                                    <label for="daysPerWeek" class="block text-sm font-medium text-gray-700 mb-1">Days per Week</label>
-                                    <input type="number" id="daysPerWeek" value="5" class="form-input w-full px-4 py-3 bg-gray-100 border-2 border-transparent rounded-lg text-lg transition duration-200">
+                                    <label for="daysPerWeek" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Days per Week</label>
+                                    <input type="number" id="daysPerWeek" value="5" class="w-full px-4 py-3 bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 rounded-lg text-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                                 </div>
                             </div>
                         </div>
                         <div>
-                             <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Comparison Adjustments</h2>
+                             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Comparison Adjustments</h2>
                              <div class="space-y-4">
                                 <div class="flex items-center justify-between">
-                                    <label for="stateSelect" class="text-sm font-medium text-gray-700">State/Territory (for holidays)</label>
-                                    <select id="stateSelect" class="form-input rounded-lg bg-gray-100 border-transparent text-sm py-1">
+                                    <label for="stateSelect" class="text-sm font-medium text-gray-700 dark:text-gray-400">State/Territory (for holidays)</label>
+                                    <select id="stateSelect" class="rounded-lg bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 text-sm py-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                                         <option value="NSW">NSW</option>
                                         <option value="VIC">VIC</option>
                                         <option value="QLD">QLD</option>
@@ -112,16 +85,25 @@
                                     </select>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Account for unpaid leave? <span class="text-xs">(Contractor)</span></span>
-                                    <label class="switch"><input type="checkbox" id="unpaidLeaveToggle"><span class="slider"></span></label>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-400">Account for unpaid leave? <span class="text-xs">(Contractor)</span></span>
+                                    <label class="relative inline-block w-[44px] h-[24px]">
+                                        <input type="checkbox" id="unpaidLeaveToggle" class="opacity-0 w-0 h-0 peer">
+                                        <span class="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-800 peer-checked:bg-green-600 transition rounded-full"></span>
+                                    </label>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Have HECS/HELP debt?</span>
-                                    <label class="switch"><input type="checkbox" id="hecsToggle"><span class="slider"></span></label>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-400">Have HECS/HELP debt?</span>
+                                    <label class="relative inline-block w-[44px] h-[24px]">
+                                        <input type="checkbox" id="hecsToggle" class="opacity-0 w-0 h-0 peer">
+                                        <span class="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-800 peer-checked:bg-green-600 transition rounded-full"></span>
+                                    </label>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">High income, no private health? <span class="text-xs">(MLS)</span></span>
-                                    <label class="switch"><input type="checkbox" id="mlsToggle"><span class="slider"></span></label>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-400">High income, no private health? <span class="text-xs">(MLS)</span></span>
+                                    <label class="relative inline-block w-[44px] h-[24px]">
+                                        <input type="checkbox" id="mlsToggle" class="opacity-0 w-0 h-0 peer">
+                                        <span class="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-800 peer-checked:bg-green-600 transition rounded-full"></span>
+                                    </label>
                                 </div>
                              </div>
                         </div>
@@ -132,79 +114,79 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     
                     <!-- Contract Column -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg">
-                        <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Contract Role</h2>
+                    <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Contract Role</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                              <div>
-                                <label for="hourlyRate" class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
-                                <input type="number" id="hourlyRate" placeholder="e.g., 80" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                                <label for="hourlyRate" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Hourly Rate ($)</label>
+                                <input type="number" id="hourlyRate" placeholder="e.g., 80" class="w-full px-3 py-2 bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                             </div>
                             <div>
-                                <label for="dailyRate" class="block text-sm font-medium text-gray-700 mb-1">Daily Rate ($)</label>
-                                <input type="number" id="dailyRate" placeholder="e.g., 640" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                                <label for="dailyRate" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Daily Rate ($)</label>
+                                <input type="number" id="dailyRate" placeholder="e.g., 640" class="w-full px-3 py-2 bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                             </div>
                         </div>
                         <div class="space-y-3">
-                            <div class="result-card">
-                                <p id="grossBillingsLabel" class="font-medium text-gray-600">Gross Yearly Billings</p>
-                                <p id="contractYearlySalary" class="text-xl font-semibold text-gray-900">$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p id="grossBillingsLabel" class="font-medium text-gray-600 dark:text-gray-400">Gross Yearly Billings</p>
+                                <p id="contractYearlySalary" class="text-xl font-semibold text-gray-900 dark:text-white">$0.00</p>
                             </div>
-                            <div class="result-card">
-                                <p class="font-medium text-red-600">Superannuation <span class="text-xs">(to pay)</span></p>
-                                <p id="contractSuper" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p class="font-medium text-red-600 dark:text-red-500">Superannuation <span class="text-xs">(to pay)</span></p>
+                                <p id="contractSuper" class="text-lg font-semibold text-red-700 dark:text-red-500">-$0.00</p>
                             </div>
-                            <div class="result-card">
-                                <p class="font-medium text-red-600">Yearly Tax <span id="contractTaxLabel" class="text-xs">(est.)</span></p>
-                                <p id="contractIncomeTax" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p class="font-medium text-red-600 dark:text-red-500">Yearly Tax <span id="contractTaxLabel" class="text-xs">(est.)</span></p>
+                                <p id="contractIncomeTax" class="text-lg font-semibold text-red-700 dark:text-red-500">-$0.00</p>
                             </div>
-                            <hr class="!my-4 border-gray-200">
-                            <div class="result-card bg-green-600 text-white">
+                            <hr class="!my-4 border-gray-200 dark:border-gray-700">
+                            <div class="bg-green-600 text-white p-5 rounded-xl shadow-md flex justify-between items-center">
                                 <p class="font-bold">Take-Home Pay (Yearly)</p>
                                 <p id="contractPostTaxYearly" class="text-xl font-bold">$0.00</p>
                             </div>
                             <div class="mt-4 space-y-2">
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Hourly</p> <p id="contractPostTaxHourly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Daily</p> <p id="contractPostTaxDaily" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Weekly</p> <p id="contractPostTaxWeekly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Fortnightly</p> <p id="contractPostTaxFortnightly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Monthly</p> <p id="contractPostTaxMonthly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Quarterly</p> <p id="contractPostTaxQuarterly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Hourly</p> <p id="contractPostTaxHourly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Daily</p> <p id="contractPostTaxDaily" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Weekly</p> <p id="contractPostTaxWeekly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Fortnightly</p> <p id="contractPostTaxFortnightly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Monthly</p> <p id="contractPostTaxMonthly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Quarterly</p> <p id="contractPostTaxQuarterly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Full-time Column -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg">
-                        <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Full-time Role</h2>
+                    <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-6 rounded-2xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Full-time Role</h2>
                         <div class="mb-6">
-                            <label for="annualSalaryInput" class="block text-sm font-medium text-gray-700 mb-1">Annual Salary (pre-tax)</label>
-                            <input type="number" id="annualSalaryInput" placeholder="e.g., 130000" class="form-input w-full px-3 py-2 bg-gray-100 rounded-lg text-base">
+                            <label for="annualSalaryInput" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Annual Salary (pre-tax)</label>
+                            <input type="number" id="annualSalaryInput" placeholder="e.g., 130000" class="w-full px-3 py-2 bg-gray-100 dark:bg-black dark:border dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-gray-600 dark:focus:ring-offset-black">
                         </div>
                          <div class="space-y-3">
-                            <div class="result-card">
-                                <p class="font-medium text-gray-600">Yearly Salary <span class="text-xs">(pre-tax)</span></p>
-                                <p id="fullTimeYearlySalary" class="text-xl font-semibold text-gray-900">$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p class="font-medium text-gray-600 dark:text-gray-400">Yearly Salary <span class="text-xs">(pre-tax)</span></p>
+                                <p id="fullTimeYearlySalary" class="text-xl font-semibold text-gray-900 dark:text-white">$0.00</p>
                             </div>
-                            <div class="result-card">
-                                <p class="font-medium text-gray-600">Superannuation</p>
-                                <p id="fullTimeSuper" class="text-lg font-semibold text-gray-800">$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p class="font-medium text-gray-600 dark:text-gray-400">Superannuation</p>
+                                <p id="fullTimeSuper" class="text-lg font-semibold text-gray-800 dark:text-gray-100">$0.00</p>
                             </div>
-                            <div class="result-card">
-                                <p class="font-medium text-red-600">Yearly Tax <span id="fullTimeTaxLabel" class="text-xs">(est.)</span></p>
-                                <p id="fullTimeIncomeTax" class="text-lg font-semibold text-red-700">-$0.00</p>
+                            <div class="bg-white dark:bg-black dark:border dark:border-gray-800 p-5 rounded-xl shadow-md flex justify-between items-center transition-all duration-300">
+                                <p class="font-medium text-red-600 dark:text-red-500">Yearly Tax <span id="fullTimeTaxLabel" class="text-xs">(est.)</span></p>
+                                <p id="fullTimeIncomeTax" class="text-lg font-semibold text-red-700 dark:text-red-500">-$0.00</p>
                             </div>
-                             <hr class="!my-4 border-gray-200">
-                            <div class="result-card bg-green-600 text-white">
+                             <hr class="!my-4 border-gray-200 dark:border-gray-700">
+                            <div class="bg-green-600 text-white p-5 rounded-xl shadow-md flex justify-between items-center">
                                 <p class="font-bold">Take-Home Pay (Yearly)</p>
                                 <p id="fullTimePostTaxYearly" class="text-xl font-bold">$0.00</p>
                             </div>
                             <div class="mt-4 space-y-2">
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Hourly</p> <p id="fullTimePostTaxHourly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Daily</p> <p id="fullTimePostTaxDaily" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Weekly</p> <p id="fullTimePostTaxWeekly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Fortnightly</p> <p id="fullTimePostTaxFortnightly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Monthly</p> <p id="fullTimePostTaxMonthly" class="font-semibold text-gray-800">$0.00</p> </div>
-                                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600">Quarterly</p> <p id="fullTimePostTaxQuarterly" class="font-semibold text-gray-800">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Hourly</p> <p id="fullTimePostTaxHourly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Daily</p> <p id="fullTimePostTaxDaily" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Weekly</p> <p id="fullTimePostTaxWeekly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Fortnightly</p> <p id="fullTimePostTaxFortnightly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Monthly</p> <p id="fullTimePostTaxMonthly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
+                                <div class="bg-gray-100 dark:bg-black dark:border dark:border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm"> <p class="font-medium text-gray-600 dark:text-gray-400">Quarterly</p> <p id="fullTimePostTaxQuarterly" class="font-semibold text-gray-800 dark:text-gray-100">$0.00</p> </div>
                             </div>
                         </div>
                     </div>
@@ -212,13 +194,13 @@
                 </div>
                 
                 <!-- Difference Comparison Section -->
-                <div class="mt-8 bg-white p-6 rounded-2xl shadow-lg text-center">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Take-Home Pay Difference</h3>
-                    <p id="differenceText" class="text-2xl font-bold text-gray-700">Enter values to compare</p>
+                <div class="mt-8 bg-white dark:bg-black dark:border dark:border-gray-800 p-6 rounded-2xl shadow-lg text-center">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Take-Home Pay Difference</h3>
+                    <p id="differenceText" class="text-2xl font-bold text-gray-700 dark:text-gray-200">Enter values to compare</p>
                 </div>
 
                 <div class="text-center mt-8">
-                    <p id="superNote" class="text-sm text-gray-500 max-w-3xl mx-auto"></p>
+                    <p id="superNote" class="text-sm text-gray-500 dark:text-gray-500 max-w-3xl mx-auto"></p>
                 </div>
             </main>
         </div>
@@ -226,6 +208,9 @@
 
     <script>
         // --- DOM Elements ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const hoursPerWeekInput = document.getElementById('hoursPerWeek');
         const daysPerWeekInput = document.getElementById('daysPerWeek');
         const superNoteEl = document.getElementById('superNote');
@@ -276,23 +261,38 @@
         const SUPER_RATE = 0.12; 
         const WEEKS_PER_YEAR_DEFAULT = 52;
         const WEEKS_PER_YEAR_WITH_LEAVE = 46; // 52 - 4 weeks annual - 2 weeks sick
-
-        const PUBLIC_HOLIDAYS = {
-            NSW: 11, VIC: 13, QLD: 11, WA: 11, SA: 11, TAS: 11, ACT: 13, NT: 11
+        const PUBLIC_HOLIDAYS = { // Approx. values
+            'NSW': 11, 'VIC': 13, 'QLD': 11, 'WA': 11,
+            'SA': 11, 'TAS': 12, 'ACT': 13, 'NT': 11
         };
-
-        const HECS_HELP_RATES = [
-            { threshold: 143837, rate: 0.10 }, { threshold: 135695, rate: 0.095 },
-            { threshold: 128014, rate: 0.09 }, { threshold: 120768, rate: 0.085 },
-            { threshold: 113932, rate: 0.08 }, { threshold: 107482, rate: 0.075 },
-            { threshold: 101398, rate: 0.07 }, { threshold: 95663, rate: 0.065 },
-            { threshold: 89923, rate: 0.06 }, { threshold: 84522, rate: 0.055 },
-            { threshold: 79442, rate: 0.05 }, { threshold: 74665, rate: 0.045 },
-            { threshold: 70176, rate: 0.04 }, { threshold: 65959, rate: 0.035 },
-            { threshold: 62002, rate: 0.03 }, { threshold: 58288, rate: 0.025 },
-            { threshold: 54805, rate: 0.02 }, { threshold: 51550, rate: 0.01 },
+        const HECS_HELP_RATES = [ // 2024-25 repayment rates
+            { threshold: 144503, rate: 0.10 }, { threshold: 136324, rate: 0.095 },
+            { threshold: 128617, rate: 0.09 }, { threshold: 121360, rate: 0.085 },
+            { threshold: 114532, rate: 0.08 }, { threshold: 108112, rate: 0.075 },
+            { threshold: 102074, rate: 0.07 }, { threshold: 96395, rate: 0.065 },
+            { threshold: 91052, rate: 0.06 }, { threshold: 86025, rate: 0.055 },
+            { threshold: 81297, rate: 0.05 }, { threshold: 76851, rate: 0.045 },
+            { threshold: 72671, rate: 0.04 }, { threshold: 68742, rate: 0.035 },
+            { threshold: 65050, rate: 0.03 }, { threshold: 61578, rate: 0.025 },
+            { threshold: 58309, rate: 0.02 }, { threshold: 55225, rate: 0.015 },
+            { threshold: 51550, rate: 0.01 },
         ];
         
+        // --- Theme Switch ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
         // --- Utility Functions ---
         const formatCurrency = (value, showNegative = false) => {
             const num = isNaN(value) || !isFinite(value) ? 0 : value;
@@ -347,19 +347,19 @@
         function updateDifference() {
             if (contractTakeHomeYearly <= 0 && fullTimeTakeHomeYearly <= 0) {
                 differenceTextEl.textContent = 'Enter values to compare';
-                differenceTextEl.className = 'text-2xl font-bold text-gray-700';
+                differenceTextEl.className = 'text-2xl font-bold text-gray-700 dark:text-gray-300';
                 return;
             }
             const difference = contractTakeHomeYearly - fullTimeTakeHomeYearly;
             if (difference > 0.01) {
                 differenceTextEl.textContent = `${formatCurrency(Math.abs(difference))} / year more as a Contractor`;
-                differenceTextEl.className = 'text-2xl font-bold text-green-700';
+                differenceTextEl.className = 'text-2xl font-bold text-green-700 dark:text-green-500';
             } else if (difference < -0.01) {
                 differenceTextEl.textContent = `${formatCurrency(Math.abs(difference))} / year more as a Full-time Employee`;
-                differenceTextEl.className = 'text-2xl font-bold text-indigo-700';
+                differenceTextEl.className = 'text-2xl font-bold text-indigo-700 dark:text-white';
             } else {
                 differenceTextEl.textContent = 'The take-home pay is effectively identical.';
-                differenceTextEl.className = 'text-2xl font-bold text-gray-800';
+                differenceTextEl.className = 'text-2xl font-bold text-gray-800 dark:text-white';
             }
         }
 
@@ -454,6 +454,12 @@
             calculateFullTime();
         }
 
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
         hourlyRateInput.addEventListener('input', () => {
             lastChangedRate = 'hourly';
             const daily = (parseFloat(hourlyRateInput.value) * (parseFloat(hoursPerWeekInput.value) || 0)) / (parseFloat(daysPerWeekInput.value) || 1);
@@ -478,6 +484,8 @@
 
         // --- Initial Load ---
         function initialize() {
+            const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
+            applyTheme(savedTheme);
             superNoteEl.textContent = `The final 'Take-Home Pay' is the key figure for comparing your net income. Calculations use the Australian Superannuation Guarantee rate of ${(SUPER_RATE * 100).toFixed(1)}% and 2024-25 tax rates. Adjustments can be made for unpaid leave, public holidays, HECS/HELP debt, and the Medicare Levy Surcharge.`;
             recalculateAll();
         }
@@ -487,4 +495,3 @@
 
 </body>
 </html>
-
